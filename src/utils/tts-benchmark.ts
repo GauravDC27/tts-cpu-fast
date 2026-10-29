@@ -313,14 +313,13 @@ export function estimateInferencePerformance(params: BenchmarkParams): LatencyEs
   
   // Select base RTF based on hardware and quantization
   let baseRtf = 0.1;
-  let ramUsage = 300;
+  // RAM follows the weights, so it depends on quantization but not on the target CPU
+  const ramUsage = params.quantization === 'int8' ? model.ramUsageMbInt8 : model.ramUsageMbFp32;
 
   if (params.targetHardware === 'ubuntu-24vcpu') {
     baseRtf = params.quantization === 'int8' ? model.ubuntu24vCpuRtfInt8 : model.ubuntu24vCpuRtfFp32;
-    ramUsage = params.quantization === 'int8' ? model.ramUsageMbInt8 : model.ramUsageMbFp32;
   } else {
     baseRtf = params.quantization === 'int8' ? model.appleM1RtfInt8 : model.appleM1RtfFp32;
-    ramUsage = params.quantization === 'int8' ? model.appleM1RtfInt8 : model.appleM1RtfFp32;
   }
 
   // Adjust for thread scaling (diminishing returns on CPU beyond 4-8 threads per inference request)
