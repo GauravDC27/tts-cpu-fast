@@ -1,0 +1,6 @@
+{
+  "name": "CPU TTS Architect & Benchmark Studio",
+  "description": "Comprehensive CPU-first TTS model evaluation, training guide, hardware latency estimator, and interactive architecture benchmark for Ubuntu v24 CPU and Apple Silicon M1.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
