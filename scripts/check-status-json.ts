@@ -1,10 +1,7 @@
 import { Client } from 'ssh2';
+import { vmConnectConfig } from './lib/vm-connection';
 
 const conn = new Client();
-const host = '103.42.50.74';
-const port = 1025;
-const username = 'ubuntu';
-const password = process.env.VM_PASSWORD || '2Lu7Yh5uN^2p7A';
 
 conn.on('ready', () => {
   const cmd = 'ps -ef | grep train_kokoro_h200.py | grep -v grep; cat /home/ubuntu/kokoro_h200_trainer/training.log | tail -n 25; cat /home/ubuntu/kokoro_h200_trainer/training_state.json 2>/dev/null';
@@ -14,4 +11,4 @@ conn.on('ready', () => {
       .on('data', (d: Buffer) => console.log(d.toString()))
       .stderr.on('data', (d: Buffer) => console.error(d.toString()));
   });
-}).connect({ host, port, username, password });
+}).connect(vmConnectConfig());

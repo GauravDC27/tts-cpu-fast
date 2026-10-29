@@ -1,10 +1,7 @@
 import { Client } from 'ssh2';
+import { vmConnectConfig } from './lib/vm-connection';
 
 const conn = new Client();
-const host = '103.42.50.74';
-const port = 1025;
-const username = 'ubuntu';
-const password = process.env.VM_PASSWORD || '2Lu7Yh5uN^2p7A';
 
 const trainingPythonScript = `"""
 Autonomous Production-Grade Kokoro-82M Training & Naturalness Enhancement Engine
@@ -338,4 +335,4 @@ conn.on('ready', () => {
       });
     });
   });
-}).connect({ host, port, username, password });
+}).connect(vmConnectConfig());

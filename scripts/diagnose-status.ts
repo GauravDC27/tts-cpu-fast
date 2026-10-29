@@ -1,10 +1,7 @@
 import { Client } from 'ssh2';
+import { vmConnectConfig } from './lib/vm-connection';
 
 const conn = new Client();
-const host = '103.42.50.74';
-const port = 1025;
-const username = 'ubuntu';
-const password = process.env.VM_PASSWORD || '2Lu7Yh5uN^2p7A';
 
 conn.on('ready', () => {
   console.log('=== CONNECTED TO H200 VM ===');
@@ -51,4 +48,4 @@ conn.on('ready', () => {
   });
 }).on('error', (err) => {
   console.error('SSH Connection error:', err);
-}).connect({ host, port, username, password, readyTimeout: 20000 });
+}).connect({ ...vmConnectConfig(), readyTimeout: 20000 });
