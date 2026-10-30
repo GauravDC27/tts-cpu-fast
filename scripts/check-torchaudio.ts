@@ -1,10 +1,7 @@
 import { Client } from 'ssh2';
+import { vmConnectConfig } from './lib/vm-connection';
 
 const conn = new Client();
-const host = '103.42.50.74';
-const port = 1025;
-const username = 'ubuntu';
-const password = process.env.VM_PASSWORD || '2Lu7Yh5uN^2p7A';
 
 conn.on('ready', () => {
   const cmd = '/home/ubuntu/kokoro/bin/python -c "import torchaudio; print(\'torchaudio:\', torchaudio.__version__)" 2>&1; /home/ubuntu/kokoro/bin/python -c "import onnx; print(\'onnx:\', onnx.__version__)" 2>&1';
@@ -14,4 +11,4 @@ conn.on('ready', () => {
       .on('data', (d: Buffer) => console.log(d.toString()))
       .stderr.on('data', (d: Buffer) => console.error(d.toString()));
   });
-}).connect({ host, port, username, password });
+}).connect(vmConnectConfig());

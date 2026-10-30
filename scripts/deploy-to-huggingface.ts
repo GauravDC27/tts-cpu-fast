@@ -63,7 +63,7 @@ async function deployToHuggingFace() {
 
   console.log(`\n🎉 Hugging Face Deployment target prepared: https://huggingface.co/${repoId}`);
   console.log('To upload large ONNX binary weights directly from your H200 server, run:');
-  console.log(`  huggingface-cli upload ${repoId} /home/ubuntu/kokoro_h200_trainer/exports/kokoro_argon_gold_certified.onnx --token ${hfToken}`);
+  console.log(`  huggingface-cli upload ${repoId} /home/ubuntu/kokoro_h200_trainer/exports/kokoro_argon_gold_certified.onnx --token "$HF_TOKEN"`);
 }
 
 deployToHuggingFace().catch(err => {

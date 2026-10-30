@@ -56,6 +56,27 @@ test('estimateInferencePerformance accurately reflects Kokoro CPU superiority vs
   assert.equal(omniEst.hardwareBottleneck, 'Sequential Dependency');
 });
 
+test('estimateInferencePerformance reports the model RAM footprint on Apple M1', () => {
+  const kokoro = TTS_CANDIDATES.find((c) => c.id === 'kokoro-82m');
+  assert.ok(kokoro);
+
+  const fp32 = estimateInferencePerformance({
+    modelId: 'kokoro-82m',
+    wordCount: 50,
+    targetHardware: 'apple-m1',
+    quantization: 'fp32'
+  });
+  const int8 = estimateInferencePerformance({
+    modelId: 'kokoro-82m',
+    wordCount: 50,
+    targetHardware: 'apple-m1',
+    quantization: 'int8'
+  });
+
+  assert.equal(fp32.memoryUsageMb, kokoro.ramUsageMbFp32);
+  assert.equal(int8.memoryUsageMb, kokoro.ramUsageMbInt8);
+});
+
 test('filterCandidates properly filters models by RTF and WER thresholds', () => {
   const cpuReady = filterCandidates(TTS_CANDIDATES, {
     maxRtf: 0.2,

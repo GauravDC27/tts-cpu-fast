@@ -10,7 +10,8 @@ import {
   BookOpen, 
   Award,
   Terminal,
-  Radio
+  Radio,
+  Share2
 } from 'lucide-react';
 
 interface HeaderProps {
