@@ -8,7 +8,8 @@ import pytest
 from onnx import TensorProto, helper
 
 from cpu_tts.config import ConfigError, Settings
-from cpu_tts.engine import KokoroEngine, ModelNotServable, check_servable
+from cpu_tts.engine import (ESPEAK_MAX_DATA_PATH, InstallPathTooLong, KokoroEngine, ModelNotServable,
+                            check_espeak_data_path, check_servable)
 
 MODEL = os.environ.get("CPU_TTS_MODEL_PATH", "models/kokoro-v1.0.onnx")
 VOICES = os.environ.get("CPU_TTS_VOICES_PATH", "models/voices-v1.0.bin")
@@ -41,6 +42,15 @@ def test_a_kokoro_shaped_onnx_is_accepted():
     kokoro = session_for([("speed", TensorProto.FLOAT), ("tokens", TensorProto.INT64),
                           ("style", TensorProto.FLOAT)], ["audio"])
     check_servable(kokoro)
+
+
+def test_espeak_data_paths_longer_than_its_buffer_are_refused(tmp_path):
+    base = tmp_path.resolve()
+    fits = base / ("d" * (ESPEAK_MAX_DATA_PATH - len(str(base)) - 1))
+    too_long = base / ("d" * (ESPEAK_MAX_DATA_PATH - len(str(base))))
+    check_espeak_data_path(str(fits))
+    with pytest.raises(InstallPathTooLong, match="shorter path"):
+        check_espeak_data_path(str(too_long))
 
 
 def test_settings_fail_closed_without_tokens():

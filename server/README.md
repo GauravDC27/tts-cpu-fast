@@ -70,13 +70,32 @@ Defaults per language: `af_heart`, `bf_emma`, `hf_alpha`, `ef_dora`, `ff_siwis`,
 With no `voice` or `language`, Devanagari text is spoken in Hindi and anything else in US English.
 Hindi sounds right only in Devanagari; romanized Hindi is read with English pronunciation.
 
+## Deploying to a VM
+
+From a machine that can SSH to the VM:
+
+```bash
+VM_HOST=<host> VM_PORT=<ssh port> VM_USER=ubuntu VOICE_TOKENS_FILE=<tokens file on the VM> server/deploy/deploy_vm.sh
+```
+
+It copies `server/` to `~/cpu_tts` on the VM and runs `deploy/remote_install.sh` there, which:
+lists any existing config or code that already mentions `/ws/cpu/tts`; refuses a port that another
+process holds (`CPU_TTS_PORT`, default 8091); installs a virtualenv with the CPU build of ONNX
+Runtime and fails if a GPU build is present; downloads and checksums the weights; installs and
+(re)starts the `cpu-tts` systemd unit, bound to 127.0.0.1 with `CUDA_VISIBLE_DEVICES` empty; then
+verifies `/healthz`, a 101 WebSocket handshake with a real token, a full spoken reply, and that the
+process holds no GPU memory. On failure it prints the service log. Running it again updates in place.
+
+The virtualenv path must stay under ~130 characters: espeak-ng keeps its data path in a 160-byte
+buffer, so the server refuses to start from a deeper install instead of failing on the first call.
+
 ## Serving it at /ws/cpu/tts on the existing host
 
-Run the server next to the existing voice gateway and route the path to it, for example with nginx:
+Route the path from the existing voice gateway to the server, for example with nginx:
 
 ```nginx
 location /ws/cpu/tts {
-    proxy_pass http://127.0.0.1:8080;
+    proxy_pass http://127.0.0.1:8091;
     proxy_http_version 1.1;
     proxy_set_header Upgrade $http_upgrade;
     proxy_set_header Connection "upgrade";
